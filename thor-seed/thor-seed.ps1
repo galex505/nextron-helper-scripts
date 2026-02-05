@@ -16,7 +16,7 @@
         The "thor-seed" script downloads THOR from an ASGARD instance, the Nextron cloud or a custom URL and executes THOR on the local system writing log files or transmitting syslog messages to a remote system
     .PARAMETER AsgardServer
         Enter the server name (FQDN) or IP address of your ASGARD instance.
-    .PARAMETER UseThorCloud
+    .PARAMETER UseCloud
         Use the official Nextron cloud systems instead of an ASGARD instance.
     .PARAMETER Token
         Download token used when connecting to Nextron's cloud service instead of an ASGARD instance.
@@ -49,7 +49,7 @@
     .EXAMPLE
         Download THOR from THOR Cloud using a download token
 
-        thor-seed -UseThorCloud -Token wWfC0A0kMziG7GRJ5XEcGdZKw3BrigavxAdw9C9yxJX
+        thor-seed -UseCloud -Token wWfC0A0kMziG7GRJ5XEcGdZKw3BrigavxAdw9C9yxJX
     .EXAMPLE
         Download THOR or THOR Lite package from a custom URL and execute it. (this also works with THOR Lite)
 
@@ -78,7 +78,7 @@ param
     [Parameter(HelpMessage = "Use Nextron's cloud to download THOR and generate a license")]
     [ValidateNotNullOrEmpty()]
     [Alias('CP')]
-    [switch]$UseThorCloud,
+    [switch]$UseCloud,
 
     [Parameter(HelpMessage = "Set a download token (used with ASGARDs and THOR Cloud)")]
     [ValidateNotNullOrEmpty()]
@@ -154,7 +154,7 @@ param
 #[string]$AsgardServer = "asgard.beta.nextron-systems.com"
 
 # Use THOR Cloudselects only APT relevant directories for file system scan
-#[bool]$UseThorCloud = $True
+#[bool]$UseCloud = $True
 
 # Download Token
 # usable with THOR Cloud and ASGARD
@@ -291,14 +291,14 @@ $global:NoLog = $NoLog
 
 # Show Help -----------------------------------------------------------
 # No ASGARD server
-if ($Args.Count -eq 0 -and $AsgardServer -eq "" -and $UseThorCloud -eq $False -and $CustomUrl -eq "")
+if ($Args.Count -eq 0 -and $AsgardServer -eq "" -and $UseCloud -eq $False -and $CustomUrl -eq "")
 {
     Get-Help $MyInvocation.MyCommand.Definition -Detailed
-    Write-Host -ForegroundColor Yellow 'Note: You must at least define an ASGARD server (-AsgardServer), use the Nextron cloud (-UseThorCloud) with an download token (-Token) or provide a custom URL to a THOR / THOR Lite ZIP package on a webserver (-CustomUrl)'
+    Write-Host -ForegroundColor Yellow 'Note: You must at least define an ASGARD server (-AsgardServer), use the Nextron cloud (-UseCloud) with an download token (-Token) or provide a custom URL to a THOR / THOR Lite ZIP package on a webserver (-CustomUrl)'
     return
 }
 # THOR Cloud but no download token
-if ($UseThorCloud -eq $True -and $Token -eq "")
+if ($UseCloud -eq $True -and $Token -eq "")
 {
     Get-Help $MyInvocation.MyCommand.Definition -Detailed
     Write-Host -ForegroundColor Yellow 'Note: You must provide an download token via command line parameter -Token or as preset value in the "presets" section of this PowerShell script.'
@@ -595,7 +595,7 @@ try
             $DownloadUrl = "https://$($AsgardServer):8443/api/v1/downloads/thor?os=windows&type=$($LicenseType)&scanner=thor10%40latest&signatures=signatures&hostname=$($Hostname)&token=$($Token)"
         }
         # Netxron Customer Portal
-        elseif ($UseThorCloud)
+        elseif ($UseCloud)
         {
             Write-Log 'Attempting to download THOR from Nextron cloud portal, please wait ...' -Level "Progress"
             $DownloadUrl = "https://cloud.nextron-systems.com/api/public/thor10"
@@ -641,7 +641,7 @@ try
         if ([int]$Response.StatusCode -eq 401 -or [int]$Response.StatusCode -eq 403)
         {
             Write-Log "The server returned an 40X status code. Did you set an download token? (-Token key)" -Level "Warning"
-            if ($UseThorCloud)
+            if ($UseCloud)
             {
                 Write-Log "Note: you can find your download token here: https://portal.nextron-systems.com/"
             }
@@ -656,7 +656,7 @@ try
             Write-Log "This could be caused by a missing Download Token (check your ASGARD server's Settings section for the Global Download Token)" -Level "Warning"
         }
         # 409
-        if ([int]$Response.StatusCode -eq 409 -and $UseThorCloud)
+        if ([int]$Response.StatusCode -eq 409 -and $UseCloud)
         {
             Write-Log "You license pool has been exhausted (quota limit)" -Level "Warning"
         }

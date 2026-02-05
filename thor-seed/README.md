@@ -37,7 +37,7 @@ thor-seed.ps1 -AsgardServer asgard1.internal -Token 74y47Wjw3wWRKlmBu4EUWFzGY-QW
 ### From THOR Cloud
 
 ```console
-thor-seed.ps1 -UseThorCloud -ApiKey 12345678
+thor-seed.ps1 -UseCloud -Token 12345678
 ```
 
 ### From a custom THOR or THOR Lite package
@@ -54,7 +54,7 @@ thor-seed.ps1 -CustomUrl https://web1.internal/thor/mythor-pack.zip
 
 Enter the server name (FQDN) or IP address of your ASGARD instance.
 
-### -UseThorCloud
+### -UseCloud
 
 Use the official Nextron THOR Cloud instead of an ASGARD instance.
 
