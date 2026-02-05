@@ -563,6 +563,9 @@ if ($Cleanup)
 # ---------------------------------------------------------------------
 # Get THOR ------------------------------------------------------------
 # ---------------------------------------------------------------------
+# Save original SSL certificate callback to restore later
+$OriginalCertCallback = [Net.ServicePointManager]::ServerCertificateValidationCallback
+
 try
 {
     # Random Delay
@@ -640,17 +643,35 @@ try
         }
         else
         {
-            Write-Log 'Download URL cannot be generated (select one of the three options: $AsgardServer, $UseThorCloud or $CustomUrl'
+            Write-Log 'Download URL cannot be generated (select one of the three options: $AsgardServer, $UseCloud or $CustomUrl'
             break
         }
-        # Actual Download
+        # Actual Download with retry logic
         Write-Log "Download URL: $($DownloadUrl)"
         # Ignore SSL/TLS errors
         if ($IgnoreSSLErrors)
         {
             [Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }
         }
-        $WebClient.DownloadFile($DownloadUrl, $TempPackage)
+        $MaxRetries = 3
+        $RetryDelay = 5
+        for ($Attempt = 1; $Attempt -le $MaxRetries; $Attempt++)
+        {
+            try
+            {
+                Write-Log "Download attempt $Attempt of $MaxRetries" -Level "Progress"
+                $WebClient.DownloadFile($DownloadUrl, $TempPackage)
+                break
+            }
+            catch
+            {
+                if ($Attempt -eq $MaxRetries) { throw }
+                Write-Log "Download failed: $($_.Exception.Message)" -Level "Warning"
+                Write-Log "Retrying in $RetryDelay seconds..." -Level "Warning"
+                Start-Sleep -Seconds $RetryDelay
+                $RetryDelay *= 2
+            }
+        }
         Write-Log "Successfully downloaded THOR package to $($TempPackage)"
     }
     # HTTP Errors
@@ -935,9 +956,15 @@ $(Get-Content -Raw $NewestLogFile)
 # ---------------------------------------------------------------------
 try
 {
+    # Restore original SSL certificate validation callback
+    if ($IgnoreSSLErrors)
+    {
+        [Net.ServicePointManager]::ServerCertificateValidationCallback = $OriginalCertCallback
+    }
+
     if ($Debugging -eq $False)
     {
-        Write-Log "Cleaning up temporary directory with THOR package ..." -Level Process
+        Write-Log "Cleaning up temporary directory with THOR package ..." -Level "Progress"
         # Delete THOR ZIP package
         Remove-Item -Confirm:$False -Force -Recurse $TempPackage -ErrorAction Ignore
         # Delete THOR Folder
