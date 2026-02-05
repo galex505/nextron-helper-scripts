@@ -20,7 +20,7 @@ The script itself writes an extensive log named `thor-seed.log`. You can deactiv
 
 - PowerShell version 3
 - 70 MB of temporary disk space
-- Network connection to a THOR source (ASGARD, [THOR Cloud](https://www.nextron-systems.com/thor-cloud/), THOR/THOR Lite as ZIP on a web server)
+- Network connection to a THOR source (ASGARD, Nextron cloud servers, THOR/THOR Lite as ZIP on a web server)
 
 ## THOR Sources
 
@@ -34,7 +34,7 @@ For details on ASGARD see [ASGARD's product page](https://www.nextron-systems.co
 thor-seed.ps1 -AsgardServer asgard1.internal -Token 74y47Wjw3wWRKlmBu4EUWFzGY-QWgdmzRZ
 ```
 
-### From THOR Cloud
+### From Nextron cloud servers
 
 ```console
 thor-seed.ps1 -UseCloud -Token 12345678

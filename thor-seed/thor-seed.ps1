@@ -47,7 +47,7 @@
 
         thor-seed -AsgardServer asgard1.intranet.local
     .EXAMPLE
-        Download THOR from THOR Cloud using a download token
+        Download THOR from Nextron cloud servers using a download token
 
         thor-seed -UseCloud -Token wWfC0A0kMziG7GRJ5XEcGdZKw3BrigavxAdw9C9yxJX
     .EXAMPLE
@@ -157,11 +157,11 @@ param
 # ASGARD Server (IP or FQDN)
 #[string]$AsgardServer = "asgard.beta.nextron-systems.com"
 
-# Use THOR Cloudselects only APT relevant directories for file system scan
+# Use Nextron cloud servers
 #[bool]$UseCloud = $True
 
 # Download Token
-# usable with THOR Cloud and ASGARD
+# usable with Nextron cloud servers and ASGARD
 #[string]$Token = "YOUR DOWNLOAD TOKEN"
 
 # Analysis Cockpit (IP or FQDN)
@@ -301,7 +301,7 @@ if ($Args.Count -eq 0 -and $AsgardServer -eq "" -and $UseCloud -eq $False -and $
     Write-Host -ForegroundColor Yellow 'Note: You must at least define an ASGARD server (-AsgardServer), use the Nextron cloud (-UseCloud) with an download token (-Token) or provide a custom URL to a THOR / THOR Lite ZIP package on a webserver (-CustomUrl)'
     return
 }
-# THOR Cloud but no download token
+# Nextron cloud servers but no download token
 if ($UseCloud -eq $True -and $Token -eq "")
 {
     Get-Help $MyInvocation.MyCommand.Definition -Detailed
@@ -708,7 +708,7 @@ try
         # 500
         if ([int]$Response.StatusCode -ge 500)
         {
-            Write-Log "THOR cloud internal error. Please report this error or try again later. (please verify that you've used a correct Token - copy&paste error?)" -Level "Warning"
+            Write-Log "Nextron cloud server internal error. Please report this error or try again later. (please verify that you've used a correct Token - copy&paste error?)" -Level "Warning"
         }
         break
     }
