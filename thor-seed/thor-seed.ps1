@@ -95,13 +95,17 @@ param
     [Alias('CK')]
     [string]$CockpitKey,
 
-    [Parameter(HelpMessage = 'Allows you to define a custom URL from which the THOR package is retrieved')]
+    [Parameter(HelpMessage = 'Allows you to define a custom URL from which the THOR package is retrieved (must start with http:// or https://)')]
     [ValidateNotNullOrEmpty()]
+    [ValidateScript({
+        if ($_ -match '^https?://') { $true }
+        else { throw "CustomUrl must start with http:// or https://" }
+    })]
     [Alias('CU')]
     [string]$CustomUrl,
 
     [Parameter(HelpMessage = 'Add a random sleep delay to the scan start to avoid all scripts starting at the exact same second')]
-    [ValidateNotNullOrEmpty()]
+    [ValidateRange(0, 3600)]
     [Alias('RD')]
     [int]$RandomDelay = 10,
 
