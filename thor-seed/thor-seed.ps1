@@ -733,7 +733,10 @@ try
             throw "Downloaded package too small ($FileSize bytes) - likely corrupted or error response"
         }
         # Verify ZIP header (PK signature = 0x504B)
-        $ZipHeader = [System.IO.File]::ReadAllBytes($TempPackage)[0..1]
+        $ZipHeader = New-Object byte[] 2
+        $stream = [System.IO.File]::OpenRead($TempPackage)
+        $null = $stream.Read($ZipHeader, 0, 2)
+        $stream.Close()
         if ($ZipHeader[0] -ne 0x50 -or $ZipHeader[1] -ne 0x4B)
         {
             throw "Downloaded file is not a valid ZIP archive (invalid header)"
