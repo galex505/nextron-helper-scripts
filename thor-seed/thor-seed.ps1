@@ -718,11 +718,27 @@ try
     try
     {
         Write-Log "Extracting THOR package" -Level "Progress"
+        # Validate ZIP file before extraction
+        if (-not (Test-Path $TempPackage))
+        {
+            throw "Downloaded package not found at $TempPackage"
+        }
+        $FileSize = (Get-Item $TempPackage).Length
+        if ($FileSize -lt 1000)
+        {
+            throw "Downloaded package too small ($FileSize bytes) - likely corrupted or error response"
+        }
+        # Verify ZIP header (PK signature = 0x504B)
+        $ZipHeader = [System.IO.File]::ReadAllBytes($TempPackage)[0..1]
+        if ($ZipHeader[0] -ne 0x50 -or $ZipHeader[1] -ne 0x4B)
+        {
+            throw "Downloaded file is not a valid ZIP archive (invalid header)"
+        }
         Expand-File $TempPackage $ThorDirectory
     }
     catch
     {
-        Write-Log "Error while expanding the THOR ZIP package $_" -Level "Error"
+        Write-Log "Error while expanding the THOR ZIP package: $($_.Exception.Message)" -Level "Error"
         break
     }
 }
