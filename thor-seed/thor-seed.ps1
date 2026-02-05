@@ -985,6 +985,23 @@ catch
 # ---------------------------------------------------------------------
 # End -----------------------------------------------------------------
 # ---------------------------------------------------------------------
-$ElapsedTime = $(get-date) - $StartTime
-$TotalTime = "{0:HH:mm:ss}" -f ([datetime]$elapsedTime.Ticks)
-Write-Log "Scan took $($TotalTime) to complete" -Level "Information"
+$ElapsedTime = $(Get-Date) - $StartTime
+$TotalTime = "{0:HH:mm:ss}" -f ([datetime]$ElapsedTime.Ticks)
+
+# Scan Summary
+Write-Log "==========================================================="
+Write-Log "THOR Seed Execution Summary"
+Write-Log "==========================================================="
+Write-Log "Hostname: $Hostname"
+Write-Log "Duration: $TotalTime"
+Write-Log "Output Path: $OutputPath"
+$FinalOutputFiles = Get-ChildItem -Path "$($OutputPath)\*" -Include "$($Hostname)_thor_*" -ErrorAction SilentlyContinue
+if ($FinalOutputFiles.Count -gt 0)
+{
+    Write-Log "Generated Files: $($FinalOutputFiles.Count)"
+}
+if (!([string]::IsNullOrEmpty($Cockpit)) -and !([string]::IsNullOrEmpty($CockpitKey)))
+{
+    Write-Log "Results uploaded to: $Cockpit"
+}
+Write-Log "==========================================================="
