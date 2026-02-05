@@ -247,6 +247,27 @@ lookback: 2 # scan only elements created or changed within the last 2 days
 
 ## Helpful Hints
 
+### Unblocking the Script
+
+When running `thor-seed.ps1` from a network share (UNC path like `\\server\share\`) or after downloading it, Windows may show this security warning:
+
+```
+Security warning
+Run only scripts that you trust. While scripts from the internet can be useful, this script can potentially harm your
+computer. If you trust this script, use the Unblock-File cmdlet to allow the script to run without this warning
+message.
+```
+
+To unblock the script before running:
+
+```powershell
+# Unblock a single file
+Unblock-File -Path .\thor-seed.ps1
+
+# Unblock all files in the directory
+Get-ChildItem -Path .\thor-seed\ -Recurse | Unblock-File
+```
+
 ### Execution
 
 If you get the following error message `cannot be loaded because the execution of scripts is disabled on this system` you may run the script as follows:
