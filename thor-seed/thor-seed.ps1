@@ -431,8 +431,24 @@ if ([System.Environment]::Is64BitOperatingSystem -eq $False)
 # License Type
 $LicenseType = "server"
 $PortalLicenseType = "server"
-$OsInfo = Get-CimInstance -ClassName Win32_OperatingSystem
-if ($osInfo.ProductType -eq 1)
+try
+{
+    $OsInfo = Get-CimInstance -ClassName Win32_OperatingSystem -ErrorAction Stop
+}
+catch
+{
+    # Fallback for older systems (Windows 7/2008 R2) or damaged WMI
+    try
+    {
+        $OsInfo = Get-WmiObject -Class Win32_OperatingSystem -ErrorAction Stop
+    }
+    catch
+    {
+        Write-Log "Could not determine OS type, defaulting to server license" -Level "Warning"
+        $OsInfo = $null
+    }
+}
+if ($null -ne $OsInfo -and $OsInfo.ProductType -eq 1)
 {
     $LicenseType = "client"
     $PortalLicenseType = "workstation"
