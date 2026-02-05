@@ -464,7 +464,11 @@ if ($AutoDetectPlatform -ne "")
 # ---------------------------------------------------------------------
 # THOR still running --------------------------------------------------
 # ---------------------------------------------------------------------
-$ThorProcess = Get-Process -Name "thor64", "thor" -ErrorAction SilentlyContinue | Select-Object -First 1
+$ThorProcess = Get-Process -Name "thor64" -ErrorAction SilentlyContinue | Select-Object -First 1
+if (-not $ThorProcess)
+{
+    $ThorProcess = Get-Process -Name "thor" -ErrorAction SilentlyContinue | Select-Object -First 1
+}
 if ($ThorProcess)
 {
     Write-Log "A THOR process is still running ($($ThorProcess.Name))." -Level "Error"
