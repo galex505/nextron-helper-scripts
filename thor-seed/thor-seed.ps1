@@ -104,7 +104,7 @@ param
     [Alias('CU')]
     [string]$CustomUrl,
 
-    [Parameter(HelpMessage = 'Add a random sleep delay to the scan start to avoid all scripts starting at the exact same second')]
+    [Parameter(HelpMessage = 'Add a random sleep delay in seconds (0-3600, i.e. 0-60 minutes) to the scan start to avoid all scripts starting at the exact same second')]
     [ValidateRange(0, 3600)]
     [Alias('RD')]
     [int]$RandomDelay = 10,
