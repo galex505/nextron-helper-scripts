@@ -56,11 +56,15 @@ Enter the server name (FQDN) or IP address of your ASGARD instance.
 
 ### -UseCloud
 
-Use the official Nextron THOR Cloud instead of an ASGARD instance.
+Use the official Nextron cloud servers instead of an ASGARD instance.
 
 ### -Token
 
 Download token used when connecting to Nextron's customer portal or an ASGARD instance.
+
+### -Comment
+
+A comment that will be transmitted to the Nextron cloud servers and shown in the customer portal for the generated license (only used with `-UseCloud`). Useful for identifying the purpose or context of a scan.
 
 ### -Cockpit
 

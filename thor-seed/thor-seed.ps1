@@ -20,6 +20,8 @@
         Use the official Nextron cloud systems instead of an ASGARD instance.
     .PARAMETER Token
         Download token used when connecting to Nextron's cloud service instead of an ASGARD instance.
+    .PARAMETER Comment
+        A comment that will be transmitted to the Nextron cloud servers and shown in the customer portal for the generated license (only used with -UseCloud).
     .PARAMETER CustomUrl
         Allows you to define a custom URL from which the THOR package is retrieved. Make sure that the package contains the full program folder, provide it as ZIP archive and add valid licenses (Incident Response license, THOR Lite license). THOR Seed will automatically find the THOR binaries in the extracted archive.
     .PARAMETER Cockpit
@@ -80,10 +82,15 @@ param
     [Alias('CP')]
     [switch]$UseCloud,
 
-    [Parameter(HelpMessage = "Set a download token (used with ASGARDs and THOR Cloud)")]
+    [Parameter(HelpMessage = "Set a download token (used with ASGARD and Nextron cloud servers)")]
     [ValidateNotNullOrEmpty()]
     [Alias('T')]
     [string]$Token,
+
+    [Parameter(HelpMessage = 'Add a comment that will be shown in the customer portal for the generated license (only used with -UseCloud)')]
+    [ValidateNotNullOrEmpty()]
+    [Alias('Co')]
+    [string]$Comment,
 
     [Parameter(HelpMessage = 'Allows you to define a Analysis Cockpit to upload the scan results')]
     [ValidateNotNullOrEmpty()]
@@ -639,6 +646,10 @@ try
             }
             $WebClient.Headers.add('X-Token', $Token)
             $WebClient.Headers.add('X-Hostname', $Hostname)
+            if ($Comment)
+            {
+                $WebClient.Headers.add('X-Comment', $Comment)
+            }
         }
         # Custom URL
         elseif ($CustomUrl -ne "")
