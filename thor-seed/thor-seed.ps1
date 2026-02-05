@@ -171,6 +171,10 @@ param
 # usable with Nextron cloud servers and ASGARD
 #[string]$Token = "YOUR DOWNLOAD TOKEN"
 
+# Comment
+# shown in the customer portal for the generated license (only used with -UseCloud)
+#[string]$Comment = "Incident Response - yourcompany.local"
+
 # Analysis Cockpit (IP or FQDN)
 #[string]$Cockpit = "cockpit.beta.nextron-systems.com"
 
