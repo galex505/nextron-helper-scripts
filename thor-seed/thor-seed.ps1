@@ -934,36 +934,26 @@ $(Get-Content -Raw $NewestLogFile)
                 [System.Net.ServicePointManager]::ServerCertificateValidationCallback = {$true}
             }
 
-            $Response = Invoke-RestMethod -Method Post -Uri $CockpitURI -Headers $Headers -Body $Body -ErrorAction Stop
-            $StatusCode = $Response.StatusCode
-
-            # Check for specific status codes
-            if ($StatusCode -eq "200") {
-                Write-Log "Upload successful" -Level "Progress"
-            }
-            elseif ($StatusCode -eq "400") {
-                Write-Log "Invalid Parameters, check the API Documentation" -Level "Error"
-                Write-Log "Server Response: $($Response.Content)" -Level "Error"
-            }
-            elseif ($StatusCode -eq "403") {
-                Write-Log "Insufficient permissions" -Level "Error"
-            }
-            elseif ($StatusCode -eq "500") {
-                Write-Log "Internal Server Error" -Level "Error"
-                Write-Log "Server Response: $($Response.Content)" -Level "Error"
-            }
-            else {
-                Write-Log "Unknown error" -Level "Error"
-                Write-Log "Server Response: $($Response.Content)" -Level "Error"
-            }
+            $Response = Invoke-WebRequest -Method Post -Uri $CockpitURI -Headers $Headers -Body $Body -UseBasicParsing -ErrorAction Stop
+            Write-Log "Upload successful to Analysis Cockpit" -Level "Progress"
         }
         else {
             Write-Log "THOR Log not found in directory $($ThorDirectory)" -Level "Error"
             break
         }
     }
+    catch [System.Net.WebException] {
+        $StatusCode = [int]$_.Exception.Response.StatusCode
+        switch ($StatusCode) {
+            400 { Write-Log "Invalid parameters - check API documentation" -Level "Error" }
+            403 { Write-Log "Insufficient permissions - verify API key has 'Upload Events' permission" -Level "Error" }
+            500 { Write-Log "Internal server error on Analysis Cockpit" -Level "Error" }
+            default { Write-Log "HTTP error $StatusCode during upload to Analysis Cockpit" -Level "Error" }
+        }
+        Write-Log "Upload failed: $($_.Exception.Message)" -Level "Error"
+    }
     catch {
-        Write-Log "Unknown error during THOR Log upload to Analysis Cockpit: $Cockpit" -Level "Error"
+        Write-Log "Error during THOR Log upload to Analysis Cockpit ($Cockpit): $($_.Exception.Message)" -Level "Error"
     }
 }
 
