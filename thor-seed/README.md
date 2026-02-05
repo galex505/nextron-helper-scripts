@@ -4,7 +4,7 @@ A THOR and THOR Lite PowerShell Launcher
 
 ## What is THOR Seed
 
-THOR Seed is a lightweight PowerShell script that facilitates the deployment of THOR in cases in which you can't or don't want to use an agent for a continous compromise assessment.
+THOR Seed is a lightweight PowerShell script that facilitates the deployment of THOR in cases in which you can't or don't want to use an agent for a continuous compromise assessment.
 
 It retrieves a THOR package from a remote source, extracts it, runs it with certain settings and removes the temporary files afterwards.
 
