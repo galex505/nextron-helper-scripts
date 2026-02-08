@@ -407,6 +407,17 @@ function Write-Log
     }
 }
 
+function Get-RedactedUrl
+{
+    param (
+        [Parameter(Mandatory = $True)]
+        [string]$Url
+    )
+
+    # Redact common credential query parameter values before writing URLs to logs.
+    return ($Url -replace '(?i)([?&](?:token|access_token|apikey|api_key|authorization)=)[^&]*', '$1***')
+}
+
 # #####################################################################
 # Main Program --------------------------------------------------------
 # #####################################################################
@@ -550,11 +561,16 @@ if ($ThorProcess -and $Cleanup)
 if ($ThorProcess)
 {
     # Get current status
-    $LastTxtFile = Get-ChildItem -Path "$($OutputPath)\*" -Include "$($Hostname)_thor_*.txt" | Sort-Object LastWriteTime | Select-Object -Last 1
+    $LastTxtFile = Get-ChildItem -Path "$($OutputPath)\*" -Include "$($Hostname)_thor_*.txt" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime | Select-Object -Last 1
+    if ($null -eq $LastTxtFile)
+    {
+        Write-Log "No THOR text log found yet in output path $($OutputPath)." -Level "Warning"
+        return
+    }
     Write-Log "Last written log file is: $($LastTxtFile.FullName)"
     Write-Log "Trying to get the last 3 log lines" -Level "Progress"
     # Get last 3 lines
-    $LastLines = Get-content -Tail 3 $LastTxtFile
+    $LastLines = Get-Content -Tail 3 $LastTxtFile.FullName -ErrorAction SilentlyContinue
     $OutLines = $LastLines -join "`r`n" | Out-String
     Write-Log "The last 3 log lines are:"
     Write-Log $OutLines
@@ -584,7 +600,11 @@ $OriginalCertCallback = [Net.ServicePointManager]::ServerCertificateValidationCa
 try
 {
     # Random Delay
-    $LocalDelay = Get-Random -Minimum 0 -Maximum $RandomDelay
+    $LocalDelay = 0
+    if ($RandomDelay -gt 0)
+    {
+        $LocalDelay = Get-Random -Minimum 0 -Maximum ($RandomDelay + 1)
+    }
     Write-Log "Adding random delay to the scan start (max. $($RandomDelay)): sleeping for $($LocalDelay) seconds" -Level "Progress"
     Start-Sleep -Seconds $LocalDelay
 
@@ -666,7 +686,8 @@ try
             break
         }
         # Actual Download with retry logic
-        Write-Log "Download URL: $($DownloadUrl)"
+        $SafeDownloadUrl = Get-RedactedUrl -Url $DownloadUrl
+        Write-Log "Download URL: $($SafeDownloadUrl)"
         # Ignore SSL/TLS errors
         if ($IgnoreSSLErrors)
         {
@@ -842,12 +863,23 @@ try
     [string[]]$ScanParameters = @()
     if ($Config)
     {
-        $ScanParameters += "-t $($Config)"
+        $ScanParameters += "-t"
+        $ScanParameters += "$($Config)"
     }
 
     # Run THOR
     Write-Log "Starting THOR scan ..." -Level "Progress"
-    Write-Log "Command Line: $($ThorBinary) $($ScanParameters)"
+    $ScanParametersForLog = $ScanParameters | ForEach-Object {
+        if ($_ -match '\s')
+        {
+            '"{0}"' -f $_
+        }
+        else
+        {
+            $_
+        }
+    }
+    Write-Log "Command Line: $($ThorBinary) $($ScanParametersForLog -join ' ')"
     Write-Log "Writing output files to $($OutputPath)"
     if (-not (Test-Path -Path $OutputPath))
     {
