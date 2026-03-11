@@ -1,4 +1,5 @@
 # nextron-helper-scripts
+
 Public tools, scripts or code snippets that can help when working with our products
 
 ## ASGARD
@@ -8,7 +9,7 @@ Public tools, scripts or code snippets that can help when working with our produ
 Written for: ASGARD v2  
 Language: Windows Batch
 
-A Windows Batch files that allows you to generate and retrieve licenses for a list of hosts from a remote ASGARD v2 system. 
+A Windows Batch files that allows you to generate and retrieve licenses for a list of hosts from a remote ASGARD v2 system.
 
 ## ASGARD Analysis Cockpit
 
@@ -17,7 +18,7 @@ A Windows Batch files that allows you to generate and retrieve licenses for a li
 Written for: Analysis Cockpit v2  
 Language: Python
 
-The converter allows you to convert the timestamp of old THOR logs to the new RFC3339 format used by SPARK. This allows you to import old THOR logs from past years without getting them indexed in the current year. 
+The converter allows you to convert the timestamp of old THOR logs to the new RFC3339 format used by SPARK. This allows you to import old THOR logs from past years without getting them indexed in the current year.
 
 ## THOR
 
