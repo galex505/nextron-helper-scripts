@@ -4,7 +4,7 @@ A THOR and THOR Lite PowerShell Launcher
 
 ## What is THOR Seed
 
-THOR Seed is a lightweight PowerShell script that facilitates the deployment of THOR in cases in which you can't or don't want to use an agent for a continous compromise assessment.
+THOR Seed is a lightweight PowerShell script that facilitates the deployment of THOR in cases in which you can't or don't want to use an agent for a continuous compromise assessment.
 
 It retrieves a THOR package from a remote source, extracts it, runs it with certain settings and removes the temporary files afterwards.
 
@@ -20,7 +20,7 @@ The script itself writes an extensive log named `thor-seed.log`. You can deactiv
 
 - PowerShell version 3
 - 70 MB of temporary disk space
-- Network connection to a THOR source (ASGARD, [THOR Cloud](https://www.nextron-systems.com/thor-cloud/), THOR/THOR Lite as ZIP on a web server)
+- Network connection to a THOR source (ASGARD, Nextron cloud servers, THOR/THOR Lite as ZIP on a web server)
 
 ## THOR Sources
 
@@ -34,10 +34,10 @@ For details on ASGARD see [ASGARD's product page](https://www.nextron-systems.co
 thor-seed.ps1 -AsgardServer asgard1.internal -Token 74y47Wjw3wWRKlmBu4EUWFzGY-QWgdmzRZ
 ```
 
-### From THOR Cloud
+### From Nextron cloud servers
 
 ```console
-thor-seed.ps1 -UseThorCloud -ApiKey 12345678
+thor-seed.ps1 -UseCloud -Token 12345678
 ```
 
 ### From a custom THOR or THOR Lite package
@@ -54,13 +54,17 @@ thor-seed.ps1 -CustomUrl https://web1.internal/thor/mythor-pack.zip
 
 Enter the server name (FQDN) or IP address of your ASGARD instance.
 
-### -UseThorCloud
+### -UseCloud
 
-Use the official Nextron THOR Cloud instead of an ASGARD instance.
+Use the official Nextron cloud servers instead of an ASGARD instance.
 
 ### -Token
 
 Download token used when connecting to Nextron's customer portal or an ASGARD instance.
+
+### -Comment
+
+A comment that will be transmitted to the Nextron cloud servers and shown in the customer portal for the generated license (only used with `-UseCloud`). Useful for identifying the purpose or context of a scan.
 
 ### -Cockpit
 
@@ -246,6 +250,27 @@ lookback: 2 # scan only elements created or changed within the last 2 days
 ```
 
 ## Helpful Hints
+
+### Unblocking the Script
+
+When running `thor-seed.ps1` from a network share (UNC path like `\\server\share\`) or after downloading it, Windows may show this security warning:
+
+```
+Security warning
+Run only scripts that you trust. While scripts from the internet can be useful, this script can potentially harm your
+computer. If you trust this script, use the Unblock-File cmdlet to allow the script to run without this warning
+message.
+```
+
+To unblock the script before running:
+
+```powershell
+# Unblock a single file
+Unblock-File -Path .\thor-seed.ps1
+
+# Unblock all files in the directory
+Get-ChildItem -Path .\thor-seed\ -Recurse | Unblock-File
+```
 
 ### Execution
 
