@@ -4,7 +4,7 @@
 # Author: Florian Roth
 # Version: 2.0.0
 # Date Created: 13.07.2020
-# Last Modified: 11.02.2026
+# Last Modified: 03.06.2026
 ##################################################
 
 #Requires -Version 3
@@ -195,6 +195,46 @@ param
     [System.Management.Automation.PSCredential][System.Management.Automation.Credential()]
     $ProxyCredentials = [System.Management.Automation.PSCredential]::Empty
 )
+
+# Detect Constrained Language Mode
+
+try
+{
+    $LanguageMode = $ExecutionContext.SessionState.LanguageMode
+
+    if ($LanguageMode -eq 'ConstrainedLanguage')
+    {
+        Write-Host ""
+        Write-Host "===========================================================" -ForegroundColor Red
+        Write-Host " ERROR: PowerShell Constrained Language Mode detected" -ForegroundColor Red
+        Write-Host "===========================================================" -ForegroundColor Red
+        Write-Host ""
+        Write-Host "Current Language Mode : $LanguageMode"
+        Write-Host ""
+        Write-Host "THOR Seed requires FullLanguage mode because it uses:"
+        Write-Host " - .NET classes"
+        Write-Host " - Add-Type"
+        Write-Host " - File and ZIP operations"
+        Write-Host " - WebClient and TLS settings"
+        Write-Host ""
+        Write-Host "The script cannot continue in Constrained Language Mode."
+        Write-Host ""
+        Write-Host "Common causes:"
+        Write-Host " - WDAC (Windows Defender Application Control)"
+        Write-Host " - AppLocker"
+        Write-Host " - JEA (Just Enough Administration)"
+        Write-Host " - Security product restrictions"
+        Write-Host ""
+
+        exit 1001
+    }
+
+    Write-Host "[+] PowerShell Language Mode: $LanguageMode"
+}
+catch
+{
+    Write-Host "[!] Unable to determine PowerShell Language Mode"
+}
 
 # #####################################################################
 # Presets -------------------------------------------------------------
